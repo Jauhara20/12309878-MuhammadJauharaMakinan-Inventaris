@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
 class Lending extends Model
@@ -12,6 +13,7 @@ class Lending extends Model
         'total',
         'keterangan',
         'returned_at',
+        'returned_by',
     ];
 
     protected $casts = [
@@ -21,5 +23,10 @@ class Lending extends Model
     public function item()
     {
         return $this->belongsTo(Item::class);
+    }
+
+    public function returnedBy()
+    {
+        return $this->belongsTo(User::class, 'returned_by');
     }
 }

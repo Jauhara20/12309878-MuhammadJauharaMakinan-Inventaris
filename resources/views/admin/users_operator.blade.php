@@ -3,29 +3,21 @@
 @section('content')
     <div class="main-content">
         <div class="info-card mb-4 info-card shadow ">
-            <div class="text-secondary">Check menu in sidebar</div>
-
-            <div class="dropdown">
-                <div class="user-profile-dropdown dropdown-toggle" data-bs-toggle="dropdown">
-                    <i class="bi bi-person-circle fs-2 text-dark"></i>
-                    <span class="text-dark fw-bold">{{ Auth::user()->name }}</span>
-                </div>
-                <ul class="dropdown-menu dropdown-menu-end shadow border-0">
-                    <li>
-                        <form action="{{ route('logout') }}" method="POST">
-                            @csrf
-                            <button type="submit" class="dropdown-item">
-                                <i class="bi bi-box-arrow-right"></i> Logout
-                            </button>
-                        </form>
-                    </li>
-                </ul>
             </div>
         </div>
         @if (session('success'))
             <div class="alert alert-success d-flex justify-content-between align-items-center">
                 <div>
                     <strong>{{ session('success') }}</strong>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
+
+        @if (session('reset_password'))
+            <div class="alert alert-success d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>Password berhasil di-reset: {{ session('reset_password') }}</strong>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
@@ -38,7 +30,7 @@
                         <h4 class="fw-bold text-dark mb-1">operator Accounts Table</h4>
                     </div>
                     <div class="d-flex gap-2">
-                        <a href="" class="btn btn-primary">Export Excel</a>
+                        <a href="{{ route('admin.user.operator.export') }}" class="btn btn-primary">Export Excel</a>
                         <a href="#" class="btn btn-success d-flex align-items-center gap-2" data-bs-toggle="modal"
                             data-bs-target="#addStaffModal">
                             <i class="bi bi-file-earmark-plus-fill"></i> Add
@@ -65,19 +57,19 @@
                                     <td>
                                         <div class="d-flex justify-content-center gap-2">
 
-                                            <form action="{{ route('operator.user.resetPassword', $user->id) }}" method="POST">
+                                            <form action="{{ route('admin.user.resetPassword', $user->id) }}" method="POST">
                                                 @csrf
                                                 <button class="btn btn-warning px-2">Reset Password</button>
                                             </form>
 
-                                            <<form action="{{ route('operator.user.delete', $user->id) }}" method="POST">
-    @csrf
-    @method('DELETE')
+                                            <form action="{{ route('admin.user.delete', $user->id) }}" method="POST">
+                                             @csrf
+                                                @method('DELETE')
 
-    <button class="bg-red-500 text-white px-3 py-1 rounded text-xs">
-        Delete
-    </button>
-</form>
+                                                        <button class="btn btn-danger text-white px-3 py-1 rounded text-xs">
+                                                                 Delete
+                                                            </button>
+                                                        </form>
 
                                         </div>
                                     </td>

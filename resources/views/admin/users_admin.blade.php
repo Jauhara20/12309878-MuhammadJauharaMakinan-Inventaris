@@ -32,7 +32,7 @@
                         <h4 class="fw-bold text-dark mb-1">Admin Accounts Table</h4>
                     </div>
                     <div class="d-flex gap-2">
-                        <a href="#" class="btn btn-primary">Export Excel</a>
+                        <a href="{{ route('admin.user.export') }}" class="btn btn-primary">Export Excel</a>
                         <a href="#" class="btn btn-success d-flex align-items-center gap-2" data-bs-toggle="modal"
                             data-bs-target="#addAdminModal">
                             <i class="bi bi-file-earmark-plus-fill"></i> Add

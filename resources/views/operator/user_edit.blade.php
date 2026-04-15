@@ -3,19 +3,6 @@
 @section('content')
     <div class="main-content">
         <div class="info-card">
-            <div class="text-secondary">Check menu in sidebar</div>
-
-            <div class="dropdown">
-                    <li>
-                        <form action="{{ route('logout') }}" method="POST">
-                            @csrf
-                            <button type="submit" class="dropdown-item">
-                                <i class="bi bi-box-arrow-right"></i> Logout
-                            </button>
-                        </form>
-                    </li>
-                </ul>
-            </div>
         </div>
 
         <div class="card border-0 shadow-sm rounded-3 p-4">
@@ -25,7 +12,7 @@
                 </div>
             </div>
 
-            <form action="{{ route('staff.update', $user->id) }}" method="POST">
+            <form action="{{ route('operator.user.update', auth()->user()->id) }}" method="POST">
                 @csrf
                 @method('PUT')
 

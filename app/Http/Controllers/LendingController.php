@@ -2,15 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\lending;
+use App\Exports\LendingsExport;
+use App\Models\Lending;
 use Illuminate\Http\Request;
 use App\Models\Item;
+use Maatwebsite\Excel\Facades\Excel;
 
 class LendingController extends Controller
 {
      public function index()
     {
-        $lendings = Lending::with('item')->get();
+        $lendings = Lending::with(['item', 'returnedBy'])->get();
         $items = Item::all();
 
         return view('operator.lendings', compact('lendings', 'items'));
@@ -18,9 +20,9 @@ class LendingController extends Controller
 
     public function detail($itemId)
     {
-        $item = Item::with('lendings')->findOrFail($itemId);
+            $item = Item::with('lendings')->findOrFail($itemId);
 
-        return view('admin.lending_detail', compact('item'));
+        return view('admin.detail', compact('item'));
     }
 
     public function store(Request $request)
@@ -31,20 +33,42 @@ class LendingController extends Controller
             'totals' => 'required|array',
         ]);
 
+        $totalsByItem = [];
         foreach ($request->items as $index => $itemId) {
+            $itemId = intval($itemId);
+            $quantity = intval($request->totals[$index]);
 
+            if ($itemId <= 0 || $quantity <= 0) {
+                continue;
+            }
+
+            $totalsByItem[$itemId] = ($totalsByItem[$itemId] ?? 0) + $quantity;
+        }
+
+        foreach ($totalsByItem as $itemId => $totalQuantity) {
             $item = Item::find($itemId);
+            if (! $item) {
+                return redirect()->back()->with('error', 'Item tidak ditemukan.');
+            }
 
-            $available = $item->stock - $item->lending_total;
+            $available = $item->available;
+            if ($totalQuantity > $available) {
+                return redirect()->back()->with('error', 'Jumlah peminjaman melebihi stok tersedia. Tersedia: ' . $available);
+            }
+        }
 
-            if ($request->totals[$index] > $available) {
-                return redirect()->back()->with('error', 'total item more than available');
+        foreach ($request->items as $index => $itemId) {
+            $itemId = intval($itemId);
+            $quantity = intval($request->totals[$index]);
+
+            if ($itemId <= 0 || $quantity <= 0) {
+                continue;
             }
 
             Lending::create([
                 'name' => $request->name,
                 'item_id' => $itemId,
-                'total' => $request->totals[$index],
+                'total' => $quantity,
                 'keterangan' => $request->keterangan,
             ]);
         }
@@ -56,32 +80,33 @@ class LendingController extends Controller
     {
         $lending = Lending::findOrFail($id);
 
+        if ($lending->returned_at) {
+            return redirect()->back()->with('success', 'Item sudah dikembalikan.');
+        }
+
         $lending->returned_at = now();
+        $lending->returned_by = auth()->id();
         $lending->save();
 
-
-        $item = $lending->item;
-        $item->stock += $lending->total;
-        $item->save();
-
-        return redirect()->back()->with('success', 'Item returned');
+        return redirect()->back()->with('success', 'Item dikembalikan oleh ' . auth()->user()->name);
     }
 
+
+    public function export()
+    {
+        return Excel::download(new LendingsExport, 'lendings.xlsx');
+    }
 
     public function destroy($id)
     {
         $lending = Lending::findOrFail($id);
 
-        if (is_null($lending->return_date)) {
-            $item = $lending->item;
-            $item->stock += $lending->total;
-            $item->save();
+        if (! $lending->returned_at) {
+            return redirect()->back()->with('error', 'Tidak bisa menghapus peminjaman yang masih dalam peminjaman.');
         }
 
         $lending->delete();
-
         return redirect()->back()->with('success', 'Lending deleted');
     }
 
-    
 }

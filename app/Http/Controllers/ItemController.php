@@ -64,7 +64,7 @@ class ItemController extends Controller
 
         if ($request->total < $currentBroken + $currentLent) {
             return redirect()->back()
-                ->withErrors(['total' => 'Total stok tidak boleh kurang dari jumlah item rusak dan item yang sedang dipinjam.'])
+                ->withErrors(['total' => 'Total stok tidak boleh kurang dari jumlah barang rusak dan barang yang sedang dipinjam.'])
                 ->withInput();
         }
 
@@ -72,7 +72,7 @@ class ItemController extends Controller
 
         if ($newBroken > $availableForDamage) {
             return redirect()->back()
-                ->withErrors(['new_broken' => 'Jumlah barang rusak tidak boleh melebihi stok tersedia.'])
+                ->withErrors(['new_broken' => 'Jumlah barang rusak tidak boleh melebihi stok tersedia setelah memperhitungkan peminjaman.'])
                 ->withInput();
         }
 
@@ -84,11 +84,23 @@ class ItemController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'Item berhasil diupdate');
-
-        
     }
+
+    public function destroy(string $id)
+    {
+        $item = Item::withCount('lendings')->findOrFail($id);
+
+        if ($item->lendings_count > 0) {
+            return redirect()->back()->with('error', 'Item tidak bisa dihapus karena memiliki riwayat peminjaman.');
+        }
+
+        $item->delete();
+
+        return redirect()->back()->with('success', 'Item berhasil dihapus');
+    }
+
     public function export()
     {
-    return Excel::download(new ItemsExport, 'items.xlsx');
+        return Excel::download(new ItemsExport, 'items.xlsx');
     }
 }

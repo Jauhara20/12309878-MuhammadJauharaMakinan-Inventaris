@@ -5,8 +5,11 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\User;
+use App\Exports\UsersExport;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
+
 
 class UserController extends Controller
 {
@@ -51,12 +54,12 @@ class UserController extends Controller
     public function edit(string $id)
     {
         $user = User::findOrFail($id);
-        return view('operator.users_edit', compact('user'));
+        return view('operator.user_edit', compact('user'));
     }
 
     public function editProfile()
     {
-        $user = auth()->user();
+        $user = auth::user();
         return view('operator.profile', compact('user'));
     }
 
@@ -89,8 +92,16 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
 
-        // password baru
-        $newPassword = Str::random(8);
+        $namePart = Str::of($user->name)
+            ->lower()
+            ->replace(' ', '')
+            ->substr(0, 4);
+
+        if ($namePart->isEmpty()) {
+            $namePart = 'user';
+        }
+
+        $newPassword = $namePart . ($user->id + 1);
 
         // update password
         $user->update([
@@ -99,10 +110,22 @@ class UserController extends Controller
         return back()->with('reset_password', $newPassword);
     }
 
+    public function export()
+    {
+        return Excel::download(new UsersExport, 'users.xlsx');
+    }
+
+    public function exportOperator()
+    {
+        return Excel::download(new UsersExport('operator'), 'operators.xlsx');
+    }
+
     public function destroy($id)
     {
         $user = User::findOrFail($id);
         $user->delete();
         return redirect()->back()->with('success', 'User deleted successfully.');
+
     }
+
 }

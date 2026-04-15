@@ -108,7 +108,9 @@
             <div class="collapse ps-3" id="usersMenu">
                 <ul class="nav flex-column">
                     <li>
-                        <a href="{{ route('admin.users_admin') }}" class="nav-link">• Admin</a>
+                        <a href="{{ route('operator.user.edit', auth()->user()->id) }}">
+                                Edit User
+                                    </a>
                     </li>
                       </div>
 
@@ -152,7 +154,7 @@
                 <a class="text-white dropdown-toggle text-decoration-none" href="#" data-bs-toggle="dropdown">
                     <i class="bi bi-person-circle"></i> {{ Auth::user()->name }}
                 </a>
-                <ul class="dropdown-menu dropdown-menu-end">    
+                <ul class="dropdown-menu dropdown-menu-end">
                     <li><hr class="dropdown-divider"></li>
                     <li>
                         <form method="POST" action="{{ route('logout') }}">

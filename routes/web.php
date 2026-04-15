@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\CategoryController; 
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\LendingController;
 use App\Http\Controllers\UserController;
@@ -36,11 +36,14 @@ Route::middleware(['role:admin'])->prefix('admin')->name('admin.')->group(functi
     Route::get('/items/export', [ItemController::class, 'export'])->name('items.export');
     Route::get('/users_admin', [UserController::class, 'index'])->name('users_admin');
     Route::get('/users_operator', [UserController::class, 'operator'])->name('users_operator');
+    Route::get('/users_operator/export', [UserController::class, 'exportOperator'])->name('user.operator.export');
+    Route::get('/users/export', [UserController::class, 'export'])->name('user.export');
     Route::post('/user/{id}/reset-password', [UserController::class, 'resetPassword'])->name('user.resetPassword');
     Route::post('/user/store', [UserController::class, 'store'])->name('user.store');
     Route::get('/users/{id}/edit', [UserController::class, 'edit'])->name('user.edit');
     Route::put('/users/{id}', [UserController::class, 'update'])->name('user.update');
     Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('user.delete');
+    Route::get('/items/{id}/detail', [LendingController::class, 'detail'])->name('items.detail');
 });
 
 
@@ -52,6 +55,7 @@ Route::middleware(['role:operator'])->prefix('operator')->name('operator.')->gro
     Route::get('/items', [ItemController::class, 'index'])->name('items.index');
 
     Route::get('/lendings', [LendingController::class, 'index'])->name('lendings.index');
+    Route::get('/lendings/export', [LendingController::class, 'export'])->name('lendings.export');
 
     Route::post('/lendings', [LendingController::class, 'store'])->name('lendings.store');
     Route::patch('/lendings/{id}/returned', [LendingController::class, 'returned'])->name('lendings.returned');

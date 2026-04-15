@@ -27,7 +27,7 @@
             <div class="card border-0 shadow-sm p-4">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <div class="d-flex gap-2">
-                        <a href="{{ route('admin.items') }}" class="btn btn-success d-flex align-items-center gap-2">
+                        <a href="{{ route('admin.items.index') }}" class="btn btn-success d-flex align-items-center gap-2">
                             <i class="bi bi-arrow-left"></i> Back
                         </a>
                     </div>

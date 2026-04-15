@@ -2,7 +2,7 @@
 
 namespace App\Exports;
 
-use App\Models\Item;
+use App\Models\Lending;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
@@ -11,11 +11,11 @@ use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithCustomStartCell;
 use Maatwebsite\Excel\Events\AfterSheet;
 
-class ItemsExport implements FromCollection, WithHeadings, WithMapping, ShouldAutoSize, WithEvents, WithCustomStartCell
+class LendingsExport implements FromCollection, WithHeadings, WithMapping, ShouldAutoSize, WithEvents, WithCustomStartCell
 {
     public function collection()
     {
-        return Item::with('category')->get();
+        return Lending::with(['item', 'returnedBy'])->get();
     }
 
     public function startCell(): string
@@ -27,10 +27,13 @@ class ItemsExport implements FromCollection, WithHeadings, WithMapping, ShouldAu
     {
         return [
             'ID',
-            'Item Name',
-            'Category',
-            'Stock',
-            'Created At'
+            'Item',
+            'Borrower',
+            'Total',
+            'Keterangan',
+            'Created At',
+            'Returned At',
+            'Returned By',
         ];
     }
 
@@ -39,8 +42,8 @@ class ItemsExport implements FromCollection, WithHeadings, WithMapping, ShouldAu
         return [
             AfterSheet::class => function (AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
-                $sheet->setCellValue('A1', 'Laporan Item');
-                $sheet->mergeCells('A1:E1');
+                $sheet->setCellValue('A1', 'Laporan Peminjaman');
+                $sheet->mergeCells('A1:H1');
                 $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
                 $sheet->getStyle('A1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
                 $sheet->getHeaderFooter()->setOddHeader('&LHalaman &P');
@@ -48,14 +51,17 @@ class ItemsExport implements FromCollection, WithHeadings, WithMapping, ShouldAu
         ];
     }
 
-    public function map($item): array
+    public function map($lending): array
     {
         return [
-            $item->id,
-            $item->name,
-            $item->category->name ?? '-', // relasi category
-            $item->stock,
-            $item->created_at->format('d-m-Y')
+            $lending->id,
+            $lending->item->name ?? '-',
+            $lending->name,
+            $lending->total,
+            $lending->keterangan ?? '-',
+            $lending->created_at ? $lending->created_at->format('d-m-Y H:i') : '-',
+            $lending->returned_at ? $lending->returned_at->format('d-m-Y H:i') : 'Not Returned',
+            $lending->returnedBy->name ?? '-',
         ];
     }
 }

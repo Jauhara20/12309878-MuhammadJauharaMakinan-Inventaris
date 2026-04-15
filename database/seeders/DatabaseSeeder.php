@@ -15,7 +15,7 @@ class DatabaseSeeder extends Seeder
     {
 
         User::updateOrCreate(
-            ['email' => 'admin@wikrama.sch.id'],
+            ['email' => 'mimin@wikrama.sch.id'],
             [
                 'name' => 'Administrator',
                 'password' => Hash::make('12345'),
@@ -25,7 +25,7 @@ class DatabaseSeeder extends Seeder
 
         // Operator user
         User::updateOrCreate(
-            ['email' => 'operator@wikrama.sch.id'],
+            ['email' => 'trator@wikrama.sch.id'],
             [
                 'name' => 'Operator Wikrama',
                 'password' => Hash::make('67890'),

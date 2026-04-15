@@ -10,7 +10,7 @@
             <h4 class="mb-0 fw-bold">Lending Table</h4>
 
             <div class="d-flex gap-2">
-                <a href="#" class="btn btn-primary">Export Excel</a>
+                <a href="{{ route('operator.lendings.export') }}" class="btn btn-primary">Export Excel</a>
                 <button class="btn btn-success d-flex align-items-center gap-2"
                         data-bs-toggle="modal"
                         data-bs-target="#addLendingModal">
@@ -40,7 +40,7 @@
                         <th>Ket.</th>
                         <th>Date</th>
                         <th>Returned</th>
-                        <th>Edited By</th>
+                        <th>Returned By</th>
                         <th class="text-center">Action</th>
                     </tr>
                 </thead>
@@ -64,7 +64,7 @@
                                 @endif
                             </td>
 
-                            <td>{{ $lending->user->name ?? '-' }}</td>
+                            <td>{{ $lending->returnedBy->name ?? '-' }}</td>
 
                             <td class="text-center">
                                 <div class="d-flex gap-2 justify-content-center">
@@ -75,13 +75,11 @@
                                             @method('PATCH')
                                             <button class="btn btn-warning btn-sm">Returned</button>
                                         </form>
-                                    @endif
 
-                                    <form action="{{ route('operator.lendings.destroy', $lending->id) }}" method="POST">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button class="btn btn-danger btn-sm">Delete</button>
-                                    </form>
+                                        <button class="btn btn-danger btn-sm" disabled title="Tidak bisa dihapus sebelum returned">Delete</button>
+                                    @else
+                                        <span class="badge bg-secondary">Already returned</span>
+                                    @endif
 
                                 </div>
                             </td>

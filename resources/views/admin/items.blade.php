@@ -24,6 +24,14 @@
                 </div>
             </div>
 
+            @if (session('error'))
+                <div class="alert alert-danger">{{ session('error') }}</div>
+            @endif
+
+            @if (session('success'))
+                <div class="alert alert-success">{{ session('success') }}</div>
+            @endif
+
             <div class="table-responsive">
                 <table class="table table-bordered border-light align-middle text-center">
                     <thead class="table-light text-secondary small text-uppercase">
@@ -49,7 +57,7 @@
                                 <td>{{ $item->damaged_items }}</td>
                                 <td>
                                     @if ($item->lending_total > 0)
-                                        <a href="{{ route('lending.detail', $item->id) }}"
+                                        <a href="{{ route('admin.items.detail', $item->id) }}"
                                             class="text-primary fw-bold text-decoration-underline">
                                             {{ $item->lending_total }}
                                         </a>
@@ -58,12 +66,20 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <a href="#" class="btn btn-primary btn-sm px-4" data-bs-toggle="modal"
-                                        data-bs-target="#editItemModal" data-id="{{ $item->id }}"
-                                        data-name="{{ $item->name }}" data-category="{{ $item->category_id }}"
-                                        data-stock="{{ $item->stock }}" data-damaged="{{ $item->damaged_items }}">
-                                        Edit
-                                    </a>
+                                    <div class="d-flex gap-2 justify-content-center">
+                                        <a href="#" class="btn btn-primary btn-sm px-4" data-bs-toggle="modal"
+                                            data-bs-target="#editItemModal" data-id="{{ $item->id }}"
+                                            data-name="{{ $item->name }}" data-category="{{ $item->category_id }}"
+                                            data-stock="{{ $item->stock }}" data-damaged="{{ $item->damaged_items }}">
+                                            Edit
+                                        </a>
+                                        <form action="{{ route('admin.items.destroy', $item->id) }}" method="POST"
+                                            onsubmit="return confirm('Yakin ingin menghapus item ini?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger btn-sm px-3">Delete</button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         @empty
